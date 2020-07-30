@@ -1,17 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Levinor.APITemplate.Configuration;
 using Levinor.Business.EF.SQL;
+using Levinor.Business.Repositories;
+using Levinor.Business.Repositories.Interfaces;
+using Levinor.Business.Services;
+using Levinor.Business.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 
 namespace APITemplate
 {
@@ -28,9 +27,22 @@ namespace APITemplate
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            //We inject the appsettings section for retrieving the connectiong string for our SQL database in EF 
+            services.AddApiVersioning();
+
+            //Adding Swagger
+            services.AddSwaggerGen(c =>
+                c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "APITemplate", Version = "v1" })
+            ); 
+
+            //Registering the SQL Entity Framework Context
             services.AddDbContext<SQLEFContext>(options =>
                    options.UseSqlServer(Configuration.GetConnectionString("SQLDatabase")));
+
+            services.AddSingleton<ISQLRepository, SQLRepository>();
+
+            services.AddSingleton<IUserService, UserService>();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,6 +51,12 @@ namespace APITemplate
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TemplateApi V1");
+                });
+
             }
 
             app.UseHttpsRedirection();
@@ -51,6 +69,8 @@ namespace APITemplate
             {
                 endpoints.MapControllers();
             });
+
+            app.UseMiddleware<ExceptionMiddleware>();
         }
     }
 }
