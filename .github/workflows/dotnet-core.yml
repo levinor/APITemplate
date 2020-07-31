@@ -20,4 +20,4 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release APITemplate/APITemplate.sln
     - name: Test
-      run: dotnet test --verbosity normal
+      run: dotnet test --verbosity normal Levinor.UnitTesting/Levinor.Business.Test.csproj
