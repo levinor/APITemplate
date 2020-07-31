@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Levinor.APITemplate", "Levinor.APITemplate.csproj", "{FC4F1C7C-83C3-435E-A433-C91812FFCCD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Levinor.APITemplate", "Levinor.APITemplate.csproj", "{FC4F1C7C-83C3-435E-A433-C91812FFCCD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Levinor.Business", "..\Business\Levinor.Business.csproj", "{13175E9D-35C8-40BE-A037-EAA44250434B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Levinor.Business", "..\Business\Levinor.Business.csproj", "{13175E9D-35C8-40BE-A037-EAA44250434B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Levinor.Business.Test", "..\Levinor.UnitTesting\Levinor.Business.Test.csproj", "{CF14E842-0F18-4D0C-808C-2D65E2A8A023}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{13175E9D-35C8-40BE-A037-EAA44250434B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13175E9D-35C8-40BE-A037-EAA44250434B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13175E9D-35C8-40BE-A037-EAA44250434B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF14E842-0F18-4D0C-808C-2D65E2A8A023}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF14E842-0F18-4D0C-808C-2D65E2A8A023}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF14E842-0F18-4D0C-808C-2D65E2A8A023}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF14E842-0F18-4D0C-808C-2D65E2A8A023}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
