@@ -8,9 +8,9 @@ Wellcome to my API Template/Playground/Portfolio. The idea is to create some sor
 - Dependency Injection. Of course.
 - EF Code First (For now only in SQL)
 - SWAGGER
+- Unit Testing: With Moked data.
 
 ## Ideas to develop
-- Unit Testing: With Moked data.
 - Multi DataBase: The idea is to have at least one SQL Data Source and a NonSQL Data Source.
     - SQL DataBase.
     - NoN SQL Database
