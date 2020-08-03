@@ -10,11 +10,13 @@ namespace Levinor.Business.EF.SQL
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Password> Passwords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("User");
             modelBuilder.Entity<Role>().ToTable("Role");
+            modelBuilder.Entity<Password>().ToTable("Password");
         }
     }   
 }

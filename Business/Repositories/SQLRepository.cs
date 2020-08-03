@@ -1,6 +1,7 @@
 ﻿using Levinor.Business.EF.SQL;
 using Levinor.Business.EF.SQL.Models;
 using Levinor.Business.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -24,7 +25,23 @@ namespace Levinor.Business.Repositories
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                List<User> response =  context.Users.ToList();
+                List<User> response =  context.Users
+                        .Include(User =>User.Role)
+                        .ToList();
+                return response;
+            }
+        }
+
+        public User GetUserById(int Id)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
+                User response = context.Users
+                    .Include(User => User.Role)
+                    .ToList()
+                    .Where(u => u.Id == Id)
+                    .FirstOrDefault();
                 return response;
             }
         }
