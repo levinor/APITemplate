@@ -45,5 +45,37 @@ namespace Levinor.Business.Repositories
                 return response;
             }
         }
+
+        public User GetUserByEmail(string email)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
+                User response = context.Users
+                    .Include(User => User.Role)
+                    .Include(User => User.Password)
+                    .ToList()
+                    .Where(u => u.Email == email)
+                    .FirstOrDefault();
+                return response;
+            }
+        }
+
+        public void UpdateUser(User user)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
+                var entry = context.Entry(user);
+                entry.State = EntityState.Modified;
+                var entryPass = context.Entry(user.Password);
+                entryPass.State = EntityState.Modified;
+                var entryRole = context.Entry(user.Role);
+                entryRole.State = EntityState.Modified;
+                context.SaveChanges();
+            }
+        }
+
+
     }
 }

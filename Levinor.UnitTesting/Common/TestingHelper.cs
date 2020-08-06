@@ -1,4 +1,5 @@
 ﻿using Levinor.Business.EF.SQL.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Levinor.Business.Test.Common
@@ -13,7 +14,8 @@ namespace Levinor.Business.Test.Common
                 Name = "Linus",
                 Surename = "Torvalds",
                 Email ="ltorvalds@ecorp.com",
-                RoleId = 1
+                RoleId = 1,
+                Password = new Password { Id = 1, Pass = "1Wq7z1ZG3W7ybdhXwFFktGTBLB/oLItx+86MWN6cSW4=", ExpiringDate = DateTime.Now.AddMonths(6)}
             });
             users.Add(new User
             {
@@ -21,7 +23,9 @@ namespace Levinor.Business.Test.Common
                 Name = "Bill",
                 Surename = "Gates",
                 Email = "bgates@ecorp.com",
-                RoleId = 2
+                RoleId = 2,
+                Password = new Password { Id = 2, Pass = "1Wq7z1ZG3W7ybdhXwFFktGTBLB/oLItx+86MWN6cSW4=", ExpiringDate = DateTime.Now.AddMonths(6) }
+
             });
             users.Add(new User
             {
@@ -29,7 +33,8 @@ namespace Levinor.Business.Test.Common
                 Name = "Alan",
                 Surename = "Turing",
                 Email = "aturing@ecorp.com",
-                RoleId = 3
+                RoleId = 3,
+                Password = new Password { Id = 3, Pass = "1Wq7z1ZG3W7ybdhXwFFktGTBLB/oLItx+86MWN6cSW4=", ExpiringDate = DateTime.Now.AddMonths(6) }
             });
 
             return users;

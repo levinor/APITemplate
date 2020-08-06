@@ -8,5 +8,7 @@ namespace Levinor.Business.Repositories.Interfaces
     {
         IEnumerable<User> GetAllUsers();
         User GetUserById(int Id);
+        User GetUserByEmail(string email);
+        void UpdateUser(User user); 
     }
 }

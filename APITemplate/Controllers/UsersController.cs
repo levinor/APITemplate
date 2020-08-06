@@ -32,10 +32,11 @@ namespace Levinor.APITemplate.Controllers
         /// Get list of all users
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("getallusers")]
-        public async Task<IActionResult> GetAllUsers()
+        [HttpGet, Route("{token}/getallusers")]
+        public async Task<IActionResult> GetAllUsers(string token)
         {
             _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetAllUsers called");
+            _service.CheckToken(token);
             return Ok(_service.GetAllUsers().Select(x => _mapper.Map<UserModel>(x)));
         }
 
@@ -45,12 +46,38 @@ namespace Levinor.APITemplate.Controllers
         /// Get a single user from his ID
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("getuser/{Id}")]
-        public async Task<IActionResult> GetUserById(int Id)
+        [HttpGet, Route("{token}/getuser/{Id}")]
+        public async Task<IActionResult> GetUserById(string token, int Id)
         {
             _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetUserById called with Id: {Id}");
+            _service.CheckToken(token);
             return Ok(_mapper.Map<UserModel>(_service.GetUserById(Id)));
         }
-        
+
+
+        /// <summary>
+        /// Tries to Login and returns a token needed for other operations
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, Route("getlogintoken")]
+        public async Task<IActionResult> GetLoginToken([FromBody] GetLoginTokenModel model)
+        {
+            _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetLoginToken called for user: {model.email}");
+            return Ok(_service.GetLoginToken(model.email, model.password));
+        }
+
+        /// <summary>
+        /// Changes thepassword for the user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, Route("{token}/setnewpassword")]
+        public async Task<IActionResult> SetNewPassword(string token, [FromBody] ChangePasswordRequestModel model)
+        {
+            _logger.LogDebug($"{HttpContext.TraceIdentifier}: ChangePassword called for user: {model.email}");
+            _service.CheckToken(token);
+            _service.SetNewPassword(token, model.email, model.currentPassword, model.newPassword);
+            return Ok();
+        }
+
     }
 }

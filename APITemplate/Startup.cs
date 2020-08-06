@@ -41,7 +41,8 @@ namespace APITemplate
                     options.EnableEndpointRouting = false;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
+            
+            services.AddMemoryCache();
 
             //Adding Swagger
             services.AddSwaggerGen(c =>
@@ -64,6 +65,7 @@ namespace APITemplate
             services.AddSingleton<ISQLRepository, SQLRepository>();
 
             services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<ICacheService, CacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -85,6 +87,7 @@ namespace APITemplate
 
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseMvc();
+
 
         }
     }
