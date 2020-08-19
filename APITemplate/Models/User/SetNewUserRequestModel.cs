@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Levinor.APITemplate.Validators.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace Levinor.APITemplate.Models.User
 {
-    public class UserModel
+    public class SetNewUserRequestModel
     {
-        public int Id { get; set; }
-
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
@@ -24,7 +22,13 @@ namespace Levinor.APITemplate.Models.User
          ErrorMessage = "Incorrect email format")]
         [Required]
         public string Email { get; set; }
+        
+        [PasswordValidator]
+        public string NewPassword { get; set; }
 
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Id needs to begreater than 0")]
+        public int RoleId { get; set; }
 
     }
 }

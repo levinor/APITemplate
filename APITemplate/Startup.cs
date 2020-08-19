@@ -47,7 +47,7 @@ namespace APITemplate
             //Adding Swagger
             services.AddSwaggerGen(c =>
                 c.SwaggerDoc(name: "v1", new OpenApiInfo { Title = "APITemplate", Version = "v1" })
-            ); 
+            );
 
             //Registering the SQL Entity Framework Context
             services.AddDbContext<SQLEFContext>(options =>

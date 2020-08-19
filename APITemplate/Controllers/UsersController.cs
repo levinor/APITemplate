@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Levinor.APITemplate.Models.User;
+using Levinor.Business.Domain;
 using Levinor.Business.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,12 +34,12 @@ namespace Levinor.APITemplate.Controllers
         /// Get list of all users
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("{token}/getallusers")]
+        [HttpGet, Route("{token}/get")]
         public async Task<IActionResult> GetAllUsers(string token)
         {
             _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetAllUsers called");
-            _service.CheckToken(token);
-            return Ok(_service.GetAllUsers().Select(x => _mapper.Map<UserModel>(x)));
+            _service.CheckToken(Guid.Parse(token));
+            return Ok(_service.GetAllUsers().Select(x => _mapper.Map<GetUserResponseModel>(x)));
         }
 
 
@@ -46,12 +48,12 @@ namespace Levinor.APITemplate.Controllers
         /// Get a single user from his ID
         /// </summary>
         /// <returns></returns>
-        [HttpGet, Route("{token}/getuser/{Id}")]
+        [HttpGet, Route("{token}/get/{Id}")]
         public async Task<IActionResult> GetUserById(string token, int Id)
         {
             _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetUserById called with Id: {Id}");
-            _service.CheckToken(token);
-            return Ok(_mapper.Map<UserModel>(_service.GetUserById(Id)));
+            _service.CheckToken(Guid.Parse(token));
+            return Ok(_mapper.Map<GetUserResponseModel>(_service.GetUserById(Id)));
         }
 
 
@@ -60,10 +62,10 @@ namespace Levinor.APITemplate.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost, Route("getlogintoken")]
-        public async Task<IActionResult> GetLoginToken([FromBody] GetLoginTokenModel model)
+        public async Task<IActionResult> GetLoginToken([FromBody] GetLoginTokenModel request)
         {
-            _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetLoginToken called for user: {model.email}");
-            return Ok(_service.GetLoginToken(model.email, model.password));
+            _logger.LogDebug($"{HttpContext.TraceIdentifier}: GetLoginToken called for user: {request.Email}");
+            return Ok(_service.GetLoginToken(_mapper.Map<User>(request), _mapper.Map<Password>(request)));
         }
 
         /// <summary>
@@ -71,11 +73,37 @@ namespace Levinor.APITemplate.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost, Route("{token}/setnewpassword")]
-        public async Task<IActionResult> SetNewPassword(string token, [FromBody] ChangePasswordRequestModel model)
+        public async Task<IActionResult> SetNewPassword(string token, [FromBody] ChangePasswordRequestModel request)
         {
-            _logger.LogDebug($"{HttpContext.TraceIdentifier}: ChangePassword called for user: {model.email}");
-            _service.CheckToken(token);
-            _service.SetNewPassword(token, model.email, model.currentPassword, model.newPassword);
+            _logger.LogDebug($"{HttpContext.TraceIdentifier}: ChangePassword called for user: {request.Email}");
+            _service.CheckToken(Guid.Parse(token));
+            _service.SetNewPassword(Guid.Parse(token), _mapper.Map<User>(request), _mapper.Map<Password>(request));
+            return Ok();
+        }
+
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, Route("{token}/new")]
+        public async Task<IActionResult> SetNewUser(string token, [FromBody] SetNewUserRequestModel request)
+        {
+            _logger.LogDebug($"{HttpContext.TraceIdentifier}: SetNewUser called for user: {request.Email}");
+            _service.CheckToken(Guid.Parse(token));
+            _service.SetNewUser(Guid.Parse(token), _mapper.Map<User>(request), _mapper.Map<Password>(request), _mapper.Map<Role>(request));
+            return Ok();
+        }
+
+        /// <summary>
+        /// Delete a user
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, Route("{token}/delete/{email}")]
+        public async Task<IActionResult> DeleteUser(string token, string email)
+        {
+            _logger.LogDebug($"{HttpContext.TraceIdentifier}: DeleteUser called for user: {email}");
+            _service.CheckToken(Guid.Parse(token));
+            _service.DeleteUser(Guid.Parse(token), email);
             return Ok();
         }
 

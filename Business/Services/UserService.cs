@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Levinor.Business.Domain;
+using Levinor.Business.Domain.Responses;
 using Levinor.Business.Repositories.Interfaces;
 using Levinor.Business.Services.Interfaces;
+using Levinor.Business.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,15 +30,30 @@ namespace Levinor.Business.Services
             _cacheService = cache;
         }
 
-        public IEnumerable<User> GetAllUsers() => _repository.GetAllUsers().ToList().Select(x => _mapper.Map<Domain.User>(x));
-
-
-        public User GetUserById(int Id)
+        public IEnumerable<GetUserResponse> GetAllUsers()
         {
-            User response;
+            List<GetUserResponse> response = new List<GetUserResponse>();
+            _repository.GetAllUsers().ToList().ForEach(x => {
+                User user = _mapper.Map<Domain.User>(x);
+                response.Add(new GetUserResponse
+                {
+                    User = user,
+                    Role = user.Role
+                });
+                });
+            return response;
+        }
+
+
+        public GetUserResponse GetUserById(int Id)
+        {
+            User user;
+            GetUserResponse response = new GetUserResponse();
             try
             {
-                response = _mapper.Map<User>(_repository.GetUserById(Id));
+                user = _mapper.Map<User>(_repository.GetUserById(Id));
+                response.User = user;
+                response.Role = user.Role;
 
             } catch (Exception e)
             {
@@ -48,7 +65,7 @@ namespace Levinor.Business.Services
             return response;
         }
 
-        public Token GetLoginToken(string email, string pass)
+        public Token GetLoginToken(User userRequest, Password passwordRequest)
         {
             User user;
 
@@ -56,66 +73,104 @@ namespace Levinor.Business.Services
             // into an Argument Exception
             try
             {
-                user = _mapper.Map<User>(_repository.GetUserByEmail(email));
+                user = _mapper.Map<User>(_repository.GetUserByEmail(userRequest.Email));
             }
-            catch
+            catch(Exception e)
             {
                 throw new ArgumentException("Incorrect Password or User");
             }
+            if(user == null) throw new ArgumentException("Incorrect Password or User");
 
             string key;
 
-            using (var algorithm = new Rfc2898DeriveBytes(pass, Encoding.ASCII.GetBytes(KeySalt)))
+            using (var algorithm = new Rfc2898DeriveBytes(passwordRequest.CurrentPassword, Encoding.ASCII.GetBytes(KeySalt)))
             {
                 key = Convert.ToBase64String(algorithm.GetBytes(KeySize));
             }
 
-            if (user.Password.Pass.Equals(key))
+            if (user.Password.CurrentPassword.Equals(key))
             {
                 return new Token {
                     token = _cacheService.generateUserToken(user),
                     needsToBeUpdated = user.Password.ExpiringDate.CompareTo(DateTime.Now) <= 0
                 };
-
             }
             else
             {
                 throw new ArgumentException("Incorrect Password or User");
             }
         }
-        public bool CheckToken(string token)
+        public bool CheckToken(Guid token)
         {
-            User user = new User();
-            return _cacheService.checkAuthToken(Guid.Parse(token), out user);
+            return _cacheService.checkAuthToken(token, out _);
         }
 
-        public void SetNewPassword(string token, string email, string currentPassword, string newPassword)
+        public void SetNewPassword(Guid token, User userRequest, Password passwordRequest)
         {
             User user;
-            _cacheService.checkAuthToken(Guid.Parse(token), out user);
+            _cacheService.checkAuthToken(token, out user);
 
-            if (user.Email != email )
+            if (user.Email != userRequest.Email)
                 throw new ArgumentException("Only logged users can change their password");
 
             string oldKey;
-            using (var algorithm = new Rfc2898DeriveBytes(currentPassword, Encoding.ASCII.GetBytes(KeySalt)))
+            using (var algorithm = new Rfc2898DeriveBytes(passwordRequest.CurrentPassword, Encoding.ASCII.GetBytes(KeySalt)))
             {
                 oldKey = Convert.ToBase64String(algorithm.GetBytes(KeySize));
             }
 
 
-            if (user.Password.Pass != oldKey)
+            if (user.Password.CurrentPassword != oldKey)
                 throw new ArgumentException("Current password is incorrect");
 
             string newKey;
-            using (var algorithm = new Rfc2898DeriveBytes(newPassword, Encoding.ASCII.GetBytes(KeySalt)))
+            using (var algorithm = new Rfc2898DeriveBytes(passwordRequest.NewPassword, Encoding.ASCII.GetBytes(KeySalt)))
             {
                 newKey = Convert.ToBase64String(algorithm.GetBytes(KeySize));
             }
 
-            user.Password.Pass = newKey;
+            user.Password.CurrentPassword = newKey;
             user.Password.ExpiringDate = DateTime.Now.AddMonths(6);
-            _repository.UpdateUser(_mapper.Map<EF.SQL.Models.User>(user));
+            _repository.UpsertUser(_mapper.Map<EF.SQL.Models.UserTable>(user));
+        }
+        public void SetNewUser(Guid token, User userRequest, Password passwordRequest, Role roleRequest)
+        {
+            User creator;
+            _cacheService.checkAuthToken(token, out creator);
+
+            if (Enum.Parse<UserType>(creator.Role.Name) != UserType.Administrator) throw new ArgumentException("Only Admins can create new users");
+
+            string newKey;
+            using (var algorithm = new Rfc2898DeriveBytes(passwordRequest.NewPassword, Encoding.ASCII.GetBytes(KeySalt)))
+            {
+                newKey = Convert.ToBase64String(algorithm.GetBytes(KeySize));
+            }
+
+            EF.SQL.Models.UserTable newUser = new EF.SQL.Models.UserTable
+            {
+                Name = userRequest.Name,
+                Surename = userRequest.Surename,
+                Email = userRequest.Email,
+                DateUpdated = DateTime.Now,
+                UserUpdated = _mapper.Map<EF.SQL.Models.UserTable>(creator),
+                Password = new EF.SQL.Models.PasswordTable
+                {
+                    Password = newKey,
+                    ExpiringDate = DateTime.Now.AddMonths(6)
+                },
+                Role = _mapper.Map <EF.SQL.Models.RoleTable>(roleRequest)
+            };           
+
+            _repository.AddUser(newUser);
+        }
+
+        public void DeleteUser(Guid token, string email)
+        {
+            User admin;
+            _cacheService.checkAuthToken(token, out admin);
+            if (Enum.Parse<UserType>(admin.Role.Name) != UserType.Administrator) throw new ArgumentException("Only Admins can delete users");
+
+            _repository.DeleteUser(email);
         }
 
     }

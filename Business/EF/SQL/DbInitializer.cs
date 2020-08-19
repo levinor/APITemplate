@@ -1,5 +1,6 @@
 ﻿using Levinor.Business.EF.SQL;
 using Levinor.Business.EF.SQL.Models;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -14,43 +15,36 @@ namespace Levinor.Business.Repositories
 
             if (!context.Roles.Any())
             {
-                var roles = new Role[]
+                var roles = new RoleTable[]
                 {
-                    new Role{Name="Administrator"},
-                    new Role{Name="User"}
+                    new RoleTable{Name="Administrator"},
+                    new RoleTable{Name="User"}
                 };
-                foreach (Role r in roles)
+                foreach (RoleTable r in roles)
                 {
                     context.Roles.Add(r);
                 }
-                context.SaveChanges();
-            }
-            if (!context.Passwords.Any())
-            {
-                var passwrod = new Password[]
-               {
-                    new Password{Pass="", ExpiringDate = DateTime.Now.AddMonths(1)},
-                    new Password{Pass="", ExpiringDate = DateTime.Now.AddMonths(1)},
-                    new Password{Pass="", ExpiringDate = DateTime.Now.AddMonths(1)},
-                    new Password{Pass="", ExpiringDate = DateTime.Now.AddMonths(1)}
-               };
-                foreach (Password p in passwrod)
+
+                var passwrod = new PasswordTable[]
+                   {
+                        new PasswordTable{Password="pg3G0EkXXiMMdg1EojpjQZXrki5lU7/s7lPhTBEtBVo=", ExpiringDate = DateTime.Now.AddMonths(1)},
+                        new PasswordTable{Password="pg3G0EkXXiMMdg1EojpjQZXrki5lU7/s7lPhTBEtBVo=", ExpiringDate = DateTime.Now.AddMonths(1)},
+                        new PasswordTable{Password="pg3G0EkXXiMMdg1EojpjQZXrki5lU7/s7lPhTBEtBVo=", ExpiringDate = DateTime.Now.AddMonths(1)},
+                        new PasswordTable{Password="pg3G0EkXXiMMdg1EojpjQZXrki5lU7/s7lPhTBEtBVo=", ExpiringDate = DateTime.Now.AddMonths(1)}
+                   };
+                foreach (PasswordTable p in passwrod)
                 {
                     context.Passwords.Add(p);
                 }
-                context.SaveChanges();
-            }
-
-            if (!context.Users.Any())
-            {
-                var users = new User[]
+          
+                var users = new UserTable[]
                 {
-                        new User{Name="Carson", Surename="Alexander", Email="c.alexander@ecorp.com", RoleId = 1, DateUpdated = DateTime.Now, PasswordId=1 },
-                        new User{Name="Alison", Surename="Smith", Email="a.smith@ecorp.com",RoleId = 1, DateUpdated = DateTime.Now, PasswordId=2 },
-                        new User{Name="Emily", Surename="Snow", Email="e.snow@ecorp.com",RoleId = 2, DateUpdated = DateTime.Now, PasswordId=3 },
-                        new User{Name="Jeff", Surename="Blacksmith", Email="j.blacksmith@ecorp.com",RoleId = 2, DateUpdated = DateTime.Now, PasswordId=4 }
+                        new UserTable{Name="Carson", Surename="Alexander", Email="c.alexander@ecorp.com", Role = roles[0], DateUpdated = DateTime.Now, Password = passwrod[0] },
+                        new UserTable{Name="Alison", Surename="Smith", Email="a.smith@ecorp.com",Role = roles[0], DateUpdated = DateTime.Now, Password = passwrod[1] },
+                        new UserTable{Name="Emily", Surename="Snow", Email="e.snow@ecorp.com",Role = roles[1], DateUpdated = DateTime.Now, Password = passwrod[2] },
+                        new UserTable{Name="Jeff", Surename="Blacksmith", Email="j.blacksmith@ecorp.com",Role = roles[1], DateUpdated = DateTime.Now, Password = passwrod[3] }
                 };
-                foreach (User u in users)
+                foreach (UserTable u in users)
                 {
                     context.Users.Add(u);
                 }

@@ -29,7 +29,7 @@ namespace Levinor.Business.Services
                     new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
 
-            _logger.LogDebug($"New user token for userId {user.Id}: {token}");
+            _logger.LogDebug($"New user token for userId {user.UserId}: {token}");
             return token;
         }
 

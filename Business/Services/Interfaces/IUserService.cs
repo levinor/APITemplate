@@ -1,20 +1,24 @@
 ﻿using Levinor.Business.Domain;
+using Levinor.Business.Domain.Responses;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Levinor.Business.Services.Interfaces
 {
     public interface IUserService
     {
-        IEnumerable<User> GetAllUsers();
-        
-        User GetUserById(int Id);
+        IEnumerable<GetUserResponse> GetAllUsers();
 
-        Token GetLoginToken(string email, string pass);
+        GetUserResponse GetUserById(int Id);
 
-        bool CheckToken(string token);
+        Token GetLoginToken(User user, Password password);
 
-        void SetNewPassword(string token, string email, string currentPassword, string newPassword);
+        bool CheckToken(Guid token);
+
+        void SetNewPassword(Guid token, User user, Password password);
+
+        void SetNewUser(Guid token, User userRequest, Password passwordRequest, Role roleRequest);
+
+        void DeleteUser(Guid token, string email);
     }
 }

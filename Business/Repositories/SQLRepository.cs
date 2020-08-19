@@ -2,12 +2,10 @@
 using Levinor.Business.EF.SQL.Models;
 using Levinor.Business.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Levinor.Business.Repositories
 {
@@ -20,58 +18,86 @@ namespace Levinor.Business.Repositories
             _serviceProvider = serviceProvider;          
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public IEnumerable<UserTable> GetAllUsers()
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                List<User> response =  context.Users
+                List<UserTable> response =  context.Users
                         .Include(User =>User.Role)
+                        .Include(User => User.Password)
                         .ToList();
                 return response;
             }
         }
 
-        public User GetUserById(int Id)
+        public UserTable GetUserById(int id)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                User response = context.Users
+                UserTable response = context.Users
                     .Include(User => User.Role)
                     .ToList()
-                    .Where(u => u.Id == Id)
+                    .Where(u => u.UserId == id)
                     .FirstOrDefault();
                 return response;
             }
         }
 
-        public User GetUserByEmail(string email)
+        public UserTable GetUserByEmail(string email)
+        {
+                IEnumerable<UserTable> response = GetAllUsers();
+                return response.Where(u => u.Email == email).FirstOrDefault();
+        }
+
+        public void UpsertUser(UserTable user)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                User response = context.Users
-                    .Include(User => User.Role)
-                    .Include(User => User.Password)
+                var role = context.Find<RoleTable>(user.Role.RoleId);
+                user.Role = role;
+                var modificator = context.Find<UserTable>(user.UserUpdated.UserId);
+                user.UserUpdated = modificator;
+                context.Update(user);
+                context.SaveChanges();
+            }
+        }
+
+        public void AddUser(UserTable user)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
+                var role = context.Find<RoleTable>(user.Role.RoleId);
+                user.Role = role;
+                var modificator = context.Find<UserTable>(user.UserUpdated.UserId);
+                user.UserUpdated = modificator;
+                context.Users.Add(user);
+                context.SaveChanges();
+            }
+        }
+        public RoleTable GetRoleById(int id)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
+                RoleTable response = context.Roles                    
                     .ToList()
-                    .Where(u => u.Email == email)
+                    .Where(u => u.RoleId == id)
                     .FirstOrDefault();
                 return response;
             }
         }
-
-        public void UpdateUser(User user)
+        public void DeleteUser(string email)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                var entry = context.Entry(user);
-                entry.State = EntityState.Modified;
-                var entryPass = context.Entry(user.Password);
-                entryPass.State = EntityState.Modified;
-                var entryRole = context.Entry(user.Role);
-                entryRole.State = EntityState.Modified;
+                var user = GetUserByEmail(email);
+                user = context.Find<UserTable>(user.UserId);
+                context.Remove(user);
                 context.SaveChanges();
             }
         }

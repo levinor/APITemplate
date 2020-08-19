@@ -9,13 +9,14 @@ Wellcome to my API Template/Playground/Portfolio. The idea is to create some sor
 - EF Code First (For now only in SQL)
 - SWAGGER
 - Unit Testing: With Moked data.
+- Cache
+- Token system to check permisions 
 
 ## Ideas to develop
 - Multi DataBase: The idea is to have at least one SQL Data Source and a NonSQL Data Source.
     - SQL DataBase.
     - NoN SQL Database
-- Cache
-- Token system to check permisions 
+-JWT
 - CORS
 - HTTP connections to other APIs
 - WS-SOAP connections (If I can find a free usable WS-SOAP)

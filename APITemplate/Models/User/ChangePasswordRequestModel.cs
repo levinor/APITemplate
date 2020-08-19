@@ -12,16 +12,16 @@ namespace Levinor.APITemplate.Models.User
         [Required]
         [StringLength(100)]
         [RegularExpression(@"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{3,}$",
-     ErrorMessage = "Characters are not allowed.")]
-        public string email { get; set; }
+            ErrorMessage = "Incorrect email format")]
+        public string Email { get; set; }
 
         [Required]
         [StringLength(1000)]
-        public string currentPassword { get; set; }
+        public string CurrentPassword { get; set; }
 
         [Required]
         [StringLength(1000)]
         [PasswordValidator]
-        public string newPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 }
