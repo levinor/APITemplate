@@ -48,42 +48,28 @@ namespace Levinor.Business.Services
 
         public GetUserResponse GetUserById(int Id)
         {
-            User user;
-            GetUserResponse response = new GetUserResponse();
-            try
-            {
-                user = _mapper.Map<User>(_repository.GetUserById(Id));
-                response.User = user;
-                response.Role = user.Role;
 
-            } catch (Exception e)
-            {
-                throw new ArgumentException($"User with ID: {Id} does not exist.");
-            }
+            UserTable userTable = _repository.GetUserById(Id);
+            if (userTable == null) throw new ArgumentException($"User with ID: {Id} does not exist.");
 
-            if (response == null) throw new ArgumentException($"User with ID: {Id} does not exist.");
+            User user = _mapper.Map<User>(userTable);
+            GetUserResponse response = new GetUserResponse
+            {
+                User = user,
+                Role = user.Role
+            };
 
             return response;
         }
 
         public Token GetLoginToken(User userRequest, Password passwordRequest)
         {
-            User user;
+            UserTable userTable = _repository.GetUserByEmail(userRequest.Email);
+            if (userTable == null) throw new ArgumentException("Incorrect Password or User");
 
-            // This try catch is only to change the Null Reference of the mapping attemp 
-            // into an Argument Exception
-            try
-            {
-                user = _mapper.Map<User>(_repository.GetUserByEmail(userRequest.Email));
-            }
-            catch(Exception e)
-            {
-                throw new ArgumentException("Incorrect Password or User");
-            }
-            if(user == null) throw new ArgumentException("Incorrect Password or User");
+            User user = _mapper.Map<User>(userTable);
 
             string key;
-
             using (var algorithm = new Rfc2898DeriveBytes(passwordRequest.CurrentPassword, Encoding.ASCII.GetBytes(KeySalt)))
             {
                 key = Convert.ToBase64String(algorithm.GetBytes(KeySize));
