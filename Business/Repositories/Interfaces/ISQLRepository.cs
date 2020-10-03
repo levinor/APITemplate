@@ -12,6 +12,6 @@ namespace Levinor.Business.Repositories.Interfaces
         void UpsertUser(UserTable user);
         void AddUser(UserTable user);
         RoleTable GetRoleById(int id);
-        void DeleteUser(string email);
+        void DeleteUser(UserTable user);
     }
 }

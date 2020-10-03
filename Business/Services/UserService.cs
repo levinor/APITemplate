@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Levinor.Business.Domain;
 using Levinor.Business.Domain.Responses;
+using Levinor.Business.EF.SQL.Models;
 using Levinor.Business.Repositories.Interfaces;
 using Levinor.Business.Services.Interfaces;
 using Levinor.Business.Utils;
@@ -170,7 +171,10 @@ namespace Levinor.Business.Services
             _cacheService.checkAuthToken(token, out admin);
             if (Enum.Parse<UserType>(admin.Role.Name) != UserType.Administrator) throw new ArgumentException("Only Admins can delete users");
 
-            _repository.DeleteUser(email);
+            UserTable toDelete = _repository.GetUserByEmail(email);
+            if (toDelete == null) throw new ArgumentException("User not found");
+
+            _repository.DeleteUser(toDelete);
         }
 
     }

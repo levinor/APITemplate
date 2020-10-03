@@ -90,13 +90,14 @@ namespace Levinor.Business.Repositories
                 return response;
             }
         }
-        public void DeleteUser(string email)
+        public void DeleteUser(UserTable user)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                var user = GetUserByEmail(email);
                 user = context.Find<UserTable>(user.UserId);
+                var pass = context.Find<PasswordTable>(user.PasswordId);
+                context.Remove(pass);
                 context.Remove(user);
                 context.SaveChanges();
             }

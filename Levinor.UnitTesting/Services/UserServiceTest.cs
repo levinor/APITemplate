@@ -319,5 +319,296 @@ namespace Levinor.Business.Test
             //Assert
             Assert.That(Assert.Throws<ArgumentException>(() => service.SetNewPassword(Guid.Parse(token), UserRequest, PasswordRequest)).Message.Contains("password"));
         }
+
+        [Test]
+        [TestCase("29ffd8bf-8f32-4b1b-9d66-93f842802662", "p4ssw0rd")]
+        public void SetNewUser_Success(string token, string password)
+        {
+            //Assert
+            var mockedResponse = _helper.getUsersList();
+
+            User Creator = new User
+            {
+                UserId = mockedResponse[0].UserId,
+                Name = mockedResponse[0].Name,
+                Surename = mockedResponse[0].Surename,
+                Email = mockedResponse[0].Email,
+                Password = new Password
+                {
+                    PasswordId = mockedResponse[0].Password.PasswordId,
+                    CurrentPassword = mockedResponse[0].Password.Password,
+                    ExpiringDate = mockedResponse[0].Password.ExpiringDate
+                },
+                Role = new Role
+                {
+                    RoleId = mockedResponse[0].Role.RoleId,
+                    Name = mockedResponse[0].Role.Name
+                }
+            };
+            this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Creator)).Returns(true);
+
+            
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserTable>(It.IsAny<Domain.User>()))
+                .Returns((Domain.User source) =>
+                {
+                    EF.SQL.Models.UserTable returnUser = new EF.SQL.Models.UserTable();
+                    returnUser.UserId = source.UserId;
+                    returnUser.Name = source.Name;
+                    returnUser.Surename = source.Surename;
+                    returnUser.Password = new EF.SQL.Models.PasswordTable
+                    {
+                        PasswordId = source.Password.PasswordId,
+                        Password = source.Password.CurrentPassword,
+                        ExpiringDate = source.Password.ExpiringDate
+                    };
+                    return returnUser;
+                });
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.RoleTable>(It.IsAny<Domain.Role>()))
+               .Returns((Domain.Role source) =>
+               {
+                   EF.SQL.Models.RoleTable returnRole = new EF.SQL.Models.RoleTable();
+                   returnRole.RoleId = source.RoleId;
+                   returnRole.Name = source.Name;   
+                   return returnRole;
+               });
+
+            this.mockedRepository.Setup(x => x.AddUser(It.IsAny<EF.SQL.Models.UserTable>()));
+
+            service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
+           
+            Password passwordModel = new Password
+            {
+                PasswordId = 666,
+                NewPassword = password,
+                ExpiringDate = DateTime.Now.AddDays(30)
+            };
+
+            Role roleModel = new Role
+            {
+                RoleId = 1,
+                Name = "Administrator"
+            };
+
+            User newUSer = new User
+            {
+                UserId = 666,
+                Name = "L",
+                Surename = "A",
+                Email = "e@ecorp.com",
+                Password = passwordModel,
+                Role = roleModel
+            };
+
+            service.SetNewUser(Guid.Parse(token), newUSer, passwordModel, roleModel);
+
+            // If execution don't throw an exception the method went ok.
+            Assert.True(true);
+
+        }
+
+        [Test]
+        [TestCase("29ffd8bf-8f32-4b1b-9d66-93f842802662", "p4ssw0rd", 2)]
+        public void SetNewUser_Fail(string token, string password, int creatorIndex)
+        {
+            //Assert
+            var mockedResponse = _helper.getUsersList();
+
+            User Creator = new User
+            {
+                UserId = mockedResponse[creatorIndex].UserId,
+                Name = mockedResponse[creatorIndex].Name,
+                Surename = mockedResponse[creatorIndex].Surename,
+                Email = mockedResponse[creatorIndex].Email,
+                Password = new Password
+                {
+                    PasswordId = mockedResponse[creatorIndex].Password.PasswordId,
+                    CurrentPassword = mockedResponse[creatorIndex].Password.Password,
+                    ExpiringDate = mockedResponse[creatorIndex].Password.ExpiringDate
+                },
+                Role = new Role
+                {
+                    RoleId = mockedResponse[creatorIndex].Role.RoleId,
+                    Name = mockedResponse[creatorIndex].Role.Name
+                }
+            };
+            this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Creator)).Returns(true);
+
+
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserTable>(It.IsAny<Domain.User>()))
+                .Returns((Domain.User source) =>
+                {
+                    EF.SQL.Models.UserTable returnUser = new EF.SQL.Models.UserTable();
+                    returnUser.UserId = source.UserId;
+                    returnUser.Name = source.Name;
+                    returnUser.Surename = source.Surename;
+                    returnUser.Password = new EF.SQL.Models.PasswordTable
+                    {
+                        PasswordId = source.Password.PasswordId,
+                        Password = source.Password.CurrentPassword,
+                        ExpiringDate = source.Password.ExpiringDate
+                    };
+                    return returnUser;
+                });
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.RoleTable>(It.IsAny<Domain.Role>()))
+               .Returns((Domain.Role source) =>
+               {
+                   EF.SQL.Models.RoleTable returnRole = new EF.SQL.Models.RoleTable();
+                   returnRole.RoleId = source.RoleId;
+                   returnRole.Name = source.Name;
+                   return returnRole;
+               });
+
+            this.mockedRepository.Setup(x => x.AddUser(It.IsAny<EF.SQL.Models.UserTable>()));
+
+            service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
+
+            Password passwordModel = new Password
+            {
+                PasswordId = 666,
+                NewPassword = password,
+                ExpiringDate = DateTime.Now.AddDays(30)
+            };
+
+            Role roleModel = new Role
+            {
+                RoleId = 1,
+                Name = "Administrator"
+            };
+
+            User newUSer = new User
+            {
+                UserId = 666,
+                Name = "L",
+                Surename = "A",
+                Email = "e@ecorp.com",
+                Password = passwordModel,
+                Role = roleModel
+            };
+
+
+            var ex = Assert.Throws<ArgumentException>(() => service.SetNewUser(Guid.Parse(token), newUSer, passwordModel, roleModel));
+
+            //Assert
+            Assert.That(Assert.Throws<ArgumentException>(() => service.SetNewUser(Guid.Parse(token), newUSer, passwordModel, roleModel)).GetType().Name == "ArgumentException");
+        }
+
+        [Test]
+        [TestCase("29ffd8bf-8f32-4b1b-9d66-93f842802662")]
+        public void DeleteUser_Success(string token)
+        {
+
+            //Assert
+            var mockedResponse = _helper.getUsersList();
+
+            User Deleter = new User
+            {
+                UserId = mockedResponse[0].UserId,
+                Name = mockedResponse[0].Name,
+                Surename = mockedResponse[0].Surename,
+                Email = mockedResponse[0].Email,
+                Password = new Password
+                {
+                    PasswordId = mockedResponse[0].Password.PasswordId,
+                    CurrentPassword = mockedResponse[0].Password.Password,
+                    ExpiringDate = mockedResponse[0].Password.ExpiringDate
+                },
+                Role = new Role
+                {
+                    RoleId = mockedResponse[0].Role.RoleId,
+                    Name = mockedResponse[0].Role.Name
+                }
+            };
+            this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Deleter)).Returns(true);
+            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>())).Returns(new EF.SQL.Models.UserTable());
+
+            service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
+            service.DeleteUser(Guid.Parse(token), "ll@ecorp.com");
+
+            // If execution don't throw an exception the method went ok.
+            Assert.True(true);
+        }
+
+        [Test]
+        [TestCase("29ffd8bf-8f32-4b1b-9d66-93f842802662", 2)]
+        public void DeleteUser_FailNotAdmin(string token, int creatorIndex)
+        {
+
+            //Assert
+            var mockedResponse = _helper.getUsersList();
+
+
+            User Deleter = new User
+            {
+                UserId = mockedResponse[creatorIndex].UserId,
+                Name = mockedResponse[creatorIndex].Name,
+                Surename = mockedResponse[creatorIndex].Surename,
+                Email = mockedResponse[creatorIndex].Email,
+                Password = new Password
+                {
+                    PasswordId = mockedResponse[creatorIndex].Password.PasswordId,
+                    CurrentPassword = mockedResponse[creatorIndex].Password.Password,
+                    ExpiringDate = mockedResponse[creatorIndex].Password.ExpiringDate
+                },
+                Role = new Role
+                {
+                    RoleId = mockedResponse[creatorIndex].Role.RoleId,
+                    Name = mockedResponse[creatorIndex].Role.Name
+                }
+            };
+            this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Deleter)).Returns(true);
+            
+            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>())).Returns(new EF.SQL.Models.UserTable());
+
+            service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
+
+            // If execution don't throw an exception the method went ok.
+            var ex = Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com"));
+
+            //Assert
+            Assert.That(Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com")).GetType().Name == "ArgumentException");
+        }
+
+        [Test]
+        [TestCase("29ffd8bf-8f32-4b1b-9d66-93f842802662", 1)]
+        public void DeleteUser_FailNotUSer(string token, int creatorIndex)
+        {
+
+            //Assert
+            var mockedResponse = _helper.getUsersList();
+
+
+            User Deleter = new User
+            {
+                UserId = mockedResponse[creatorIndex].UserId,
+                Name = mockedResponse[creatorIndex].Name,
+                Surename = mockedResponse[creatorIndex].Surename,
+                Email = mockedResponse[creatorIndex].Email,
+                Password = new Password
+                {
+                    PasswordId = mockedResponse[creatorIndex].Password.PasswordId,
+                    CurrentPassword = mockedResponse[creatorIndex].Password.Password,
+                    ExpiringDate = mockedResponse[creatorIndex].Password.ExpiringDate
+                },
+                Role = new Role
+                {
+                    RoleId = mockedResponse[creatorIndex].Role.RoleId,
+                    Name = mockedResponse[creatorIndex].Role.Name
+                }
+            };
+            this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Deleter)).Returns(true);
+
+            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>()));
+
+            service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
+
+            // If execution don't throw an exception the method went ok.
+            var ex = Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com"));
+
+            //Assert
+            Assert.That(Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com")).GetType().Name == "ArgumentException");
+        }
     }
 }
