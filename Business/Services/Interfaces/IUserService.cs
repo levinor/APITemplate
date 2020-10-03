@@ -7,9 +7,9 @@ namespace Levinor.Business.Services.Interfaces
 {
     public interface IUserService
     {
-        IEnumerable<GetUserResponse> GetAllUsers();
+        IEnumerable<User> GetAllUsers();
 
-        GetUserResponse GetUserById(int Id);
+        User GetUserById(int Id);
 
         Token GetLoginToken(User user, Password password);
 
@@ -17,8 +17,9 @@ namespace Levinor.Business.Services.Interfaces
 
         void SetNewPassword(Guid token, User user, Password password);
 
-        void SetNewUser(Guid token, User userRequest, Password passwordRequest, Role roleRequest);
+        void SetNewUser(Guid token, User userRequest, Password passwordRequest);
 
-        void DeleteUser(Guid token, string email);
+        void DeactiveUser(Guid token, string email);
+
     }
 }

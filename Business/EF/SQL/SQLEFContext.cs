@@ -12,32 +12,30 @@ namespace Levinor.Business.EF.SQL
             Database.Migrate();
         }
 
-        public DbSet<UserTable> Users { get; set; }
-        public DbSet<RoleTable> Roles { get; set; }
-        public DbSet<PasswordTable> Passwords { get; set; }
+        public DbSet<UserDto> Users { get; set; }
+        public DbSet<PasswordDto> Passwords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            #region UserTable
-            modelBuilder.Entity<UserTable>()
+            #region UserDto
+            modelBuilder.Entity<UserDto>()
                 .Property(p => p.UserId)
                 .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<UserTable>()
+            modelBuilder.Entity<UserDto>()
                .HasKey(k => k.UserId);
 
-            modelBuilder.Entity<UserTable>()
-                 .HasOne(u => u.UserUpdated)
+            modelBuilder.Entity<UserDto>()
+                 .HasOne(u => u.Updater)
                  .WithMany()
                  .OnDelete(DeleteBehavior.NoAction);
-           
-            modelBuilder.Entity<UserTable>()
-                 .HasOne(r => r.Role)
-                 .WithMany(u => u.Users)
-                 .IsRequired()
+            
+            modelBuilder.Entity<UserDto>()
+                 .HasOne(u => u.Supervisor)
+                 .WithMany()
                  .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<UserTable>()
+            modelBuilder.Entity<UserDto>()
                  .HasOne(p => p.Password)
                  .WithOne(u => u.User)
                  .IsRequired()
@@ -45,23 +43,15 @@ namespace Levinor.Business.EF.SQL
 
             #endregion
 
-            #region PasswordTable
-            modelBuilder.Entity<PasswordTable>()
+            #region PasswordDto
+            modelBuilder.Entity<PasswordDto>()
                 .Property(p => p.PasswordId)
                 .ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<PasswordTable>()
+            modelBuilder.Entity<PasswordDto>()
                .HasKey(k => k.PasswordId);
             #endregion
 
-            #region RoleTable
-            modelBuilder.Entity<RoleTable>()
-                .Property(p => p.RoleId)
-                .ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<RoleTable>()
-               .HasKey(k => k.RoleId);
-            #endregion
         }
     }   
 }

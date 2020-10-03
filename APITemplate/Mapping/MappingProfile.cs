@@ -21,12 +21,12 @@ namespace Levinor.APITemplate.Mapping
         private void CreateBusinessMappings()
         {
             #region User
-            CreateMap<Business.Domain.Password, Business.EF.SQL.Models.PasswordTable>()
+            CreateMap<Business.Domain.Password, Business.EF.SQL.Models.PasswordDto>()
                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.CurrentPassword))
                 .ReverseMap();
-            CreateMap<Business.Domain.Role, Business.EF.SQL.Models.RoleTable>()
+            CreateMap<Business.Domain.Role, Business.EF.SQL.Models.RoleDto>()
                 .ReverseMap();
-            CreateMap<Business.Domain.User, Business.EF.SQL.Models.UserTable>()
+            CreateMap<Business.Domain.User, Business.EF.SQL.Models.UserDto>()
                 .ReverseMap();
             #endregion
         }

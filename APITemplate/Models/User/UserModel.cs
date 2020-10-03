@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Levinor.APITemplate.Validators.Attributes;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Levinor.APITemplate.Models.User
 {
+    [UserCreationValidator]
     public class UserModel
     {
         public int Id { get; set; }
@@ -25,6 +27,10 @@ namespace Levinor.APITemplate.Models.User
         [Required]
         public string Email { get; set; }
 
+        [Required]
+        public UserModel Supervisor { get; set; }
 
+        [Required]
+        public UserType Role { get; set; }
     }
 }

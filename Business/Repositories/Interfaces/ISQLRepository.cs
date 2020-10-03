@@ -6,12 +6,12 @@ namespace Levinor.Business.Repositories.Interfaces
 {
     public interface ISQLRepository
     {
-        IEnumerable<UserTable> GetAllUsers();
-        UserTable GetUserById(int id);
-        UserTable GetUserByEmail(string email);
-        void UpsertUser(UserTable user);
-        void AddUser(UserTable user);
-        RoleTable GetRoleById(int id);
-        void DeleteUser(UserTable user);
+        IEnumerable<UserDto> GetAllUsers();
+        UserDto GetUserById(int id);
+        UserDto GetUserByEmail(string email);
+        void UpsertUser(UserDto user);
+        void AddUser(UserDto user);
+        RoleDto GetRoleById(int id);
+        void DeleteUser(UserDto user);
     }
 }

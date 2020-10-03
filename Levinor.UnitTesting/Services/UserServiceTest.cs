@@ -37,8 +37,8 @@ namespace Levinor.Business.Test
             var mockedResponse = _helper.getUsersList();
 
             this.mockedRepository.Setup(x => x.GetAllUsers()).Returns(mockedResponse);
-            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserTable>()))
-                .Returns((EF.SQL.Models.UserTable source) =>
+            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserDto>()))
+                .Returns((EF.SQL.Models.UserDto source) =>
                 {
                     Domain.User returnUser = new Domain.User();
                     returnUser.UserId = source.UserId;
@@ -67,8 +67,8 @@ namespace Levinor.Business.Test
             var mockedResponse = _helper.getUsersList();
 
             this.mockedRepository.Setup(x => x.GetUserById(value)).Returns(mockedResponse.Where(u => u.UserId == value).FirstOrDefault());
-            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserTable>()))
-               .Returns((EF.SQL.Models.UserTable source) =>
+            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserDto>()))
+               .Returns((EF.SQL.Models.UserDto source) =>
                {
                    Domain.User returnUser = new Domain.User();
                    returnUser.UserId = source.UserId;
@@ -94,8 +94,8 @@ namespace Levinor.Business.Test
             var mockedResponse = _helper.getUsersList();
 
             this.mockedRepository.Setup(x => x.GetUserById(value)).Returns(mockedResponse.Where(u => u.UserId == value).FirstOrDefault());
-            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserTable>()))
-              .Returns((EF.SQL.Models.UserTable source) =>
+            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserDto>()))
+              .Returns((EF.SQL.Models.UserDto source) =>
               {
                   Domain.User returnUser = new Domain.User();
                   returnUser.UserId = source.UserId;
@@ -123,8 +123,8 @@ namespace Levinor.Business.Test
             var mockedResponse = _helper.getUsersList();
 
             this.mockedRepository.Setup(x => x.GetUserByEmail(email)).Returns(mockedResponse.Where(u => u.Email == email).FirstOrDefault());
-            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserTable>()))
-              .Returns((EF.SQL.Models.UserTable source) =>
+            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserDto>()))
+              .Returns((EF.SQL.Models.UserDto source) =>
               {
                   Domain.User returnUser = new Domain.User();
                   returnUser.UserId = source.UserId;
@@ -167,8 +167,8 @@ namespace Levinor.Business.Test
             var mockedResponse = _helper.getUsersList();
 
             this.mockedRepository.Setup(x => x.GetUserByEmail(email)).Returns(mockedResponse.Where(u => u.Email == email).FirstOrDefault());
-            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserTable>()))
-              .Returns((EF.SQL.Models.UserTable source) =>
+            this.mockedMapper.Setup(x => x.Map<Domain.User>(It.IsAny<EF.SQL.Models.UserDto>()))
+              .Returns((EF.SQL.Models.UserDto source) =>
               {
                   Domain.User returnUser = new Domain.User();
                   returnUser.UserId = source.UserId;
@@ -224,14 +224,14 @@ namespace Levinor.Business.Test
             };
 
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out  user)).Returns(true);
-            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserTable>(It.IsAny<Domain.User>()))
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserDto>(It.IsAny<Domain.User>()))
                 .Returns((Domain.User source) =>
                 {
-                    EF.SQL.Models.UserTable returnUser = new EF.SQL.Models.UserTable();
+                    EF.SQL.Models.UserDto returnUser = new EF.SQL.Models.UserDto();
                     returnUser.UserId = source.UserId;
                     returnUser.Name = source.Name;
                     returnUser.Surename = source.Surename;
-                    returnUser.Password = new EF.SQL.Models.PasswordTable
+                    returnUser.Password = new EF.SQL.Models.PasswordDto
                     {
                         PasswordId = source.Password.PasswordId,
                         Password = source.Password.CurrentPassword,
@@ -240,7 +240,7 @@ namespace Levinor.Business.Test
                     return returnUser;
                 });
 
-            this.mockedRepository.Setup(x => x.UpsertUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.UpsertUser(It.IsAny<EF.SQL.Models.UserDto>()));
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
 
@@ -284,14 +284,14 @@ namespace Levinor.Business.Test
             };
 
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out user)).Returns(true);
-            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserTable>(It.IsAny<Domain.User>()))
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserDto>(It.IsAny<Domain.User>()))
                 .Returns((Domain.User source) =>
                 {
-                    EF.SQL.Models.UserTable returnUser = new EF.SQL.Models.UserTable();
+                    EF.SQL.Models.UserDto returnUser = new EF.SQL.Models.UserDto();
                     returnUser.UserId = source.UserId;
                     returnUser.Name = source.Name;
                     returnUser.Surename = source.Surename;
-                    returnUser.Password = new EF.SQL.Models.PasswordTable
+                    returnUser.Password = new EF.SQL.Models.PasswordDto
                     {
                         PasswordId = source.Password.PasswordId,
                         Password = source.Password.CurrentPassword,
@@ -300,7 +300,7 @@ namespace Levinor.Business.Test
                     return returnUser;
                 });
 
-            this.mockedRepository.Setup(x => x.UpsertUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.UpsertUser(It.IsAny<EF.SQL.Models.UserDto>()));
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
 
@@ -339,23 +339,23 @@ namespace Levinor.Business.Test
                     CurrentPassword = mockedResponse[0].Password.Password,
                     ExpiringDate = mockedResponse[0].Password.ExpiringDate
                 },
-                Role = new Role
-                {
-                    RoleId = mockedResponse[0].Role.RoleId,
-                    Name = mockedResponse[0].Role.Name
-                }
+                //Role = new Role
+                //{
+                //    RoleId = mockedResponse[0].Role.RoleId,
+                //    Name = mockedResponse[0].Role.Name
+                //}
             };
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Creator)).Returns(true);
 
             
-            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserTable>(It.IsAny<Domain.User>()))
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserDto>(It.IsAny<Domain.User>()))
                 .Returns((Domain.User source) =>
                 {
-                    EF.SQL.Models.UserTable returnUser = new EF.SQL.Models.UserTable();
+                    EF.SQL.Models.UserDto returnUser = new EF.SQL.Models.UserDto();
                     returnUser.UserId = source.UserId;
                     returnUser.Name = source.Name;
                     returnUser.Surename = source.Surename;
-                    returnUser.Password = new EF.SQL.Models.PasswordTable
+                    returnUser.Password = new EF.SQL.Models.PasswordDto
                     {
                         PasswordId = source.Password.PasswordId,
                         Password = source.Password.CurrentPassword,
@@ -363,16 +363,16 @@ namespace Levinor.Business.Test
                     };
                     return returnUser;
                 });
-            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.RoleTable>(It.IsAny<Domain.Role>()))
-               .Returns((Domain.Role source) =>
-               {
-                   EF.SQL.Models.RoleTable returnRole = new EF.SQL.Models.RoleTable();
-                   returnRole.RoleId = source.RoleId;
-                   returnRole.Name = source.Name;   
-                   return returnRole;
-               });
+            //this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.RoleDto>(It.IsAny<Domain.Role>()))
+            //   .Returns((Domain.Role source) =>
+            //   {
+            //       EF.SQL.Models.RoleDto returnRole = new EF.SQL.Models.RoleDto();
+            //       returnRole.RoleId = source.RoleId;
+            //       returnRole.Name = source.Name;   
+            //       return returnRole;
+            //   });
 
-            this.mockedRepository.Setup(x => x.AddUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.AddUser(It.IsAny<EF.SQL.Models.UserDto>()));
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
            
@@ -425,23 +425,23 @@ namespace Levinor.Business.Test
                     CurrentPassword = mockedResponse[creatorIndex].Password.Password,
                     ExpiringDate = mockedResponse[creatorIndex].Password.ExpiringDate
                 },
-                Role = new Role
-                {
-                    RoleId = mockedResponse[creatorIndex].Role.RoleId,
-                    Name = mockedResponse[creatorIndex].Role.Name
-                }
+                //Role = new Role
+                //{
+                //    RoleId = mockedResponse[creatorIndex].Role.RoleId,
+                //    Name = mockedResponse[creatorIndex].Role.Name
+                //}
             };
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Creator)).Returns(true);
 
 
-            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserTable>(It.IsAny<Domain.User>()))
+            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.UserDto>(It.IsAny<Domain.User>()))
                 .Returns((Domain.User source) =>
                 {
-                    EF.SQL.Models.UserTable returnUser = new EF.SQL.Models.UserTable();
+                    EF.SQL.Models.UserDto returnUser = new EF.SQL.Models.UserDto();
                     returnUser.UserId = source.UserId;
                     returnUser.Name = source.Name;
                     returnUser.Surename = source.Surename;
-                    returnUser.Password = new EF.SQL.Models.PasswordTable
+                    returnUser.Password = new EF.SQL.Models.PasswordDto
                     {
                         PasswordId = source.Password.PasswordId,
                         Password = source.Password.CurrentPassword,
@@ -449,16 +449,16 @@ namespace Levinor.Business.Test
                     };
                     return returnUser;
                 });
-            this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.RoleTable>(It.IsAny<Domain.Role>()))
-               .Returns((Domain.Role source) =>
-               {
-                   EF.SQL.Models.RoleTable returnRole = new EF.SQL.Models.RoleTable();
-                   returnRole.RoleId = source.RoleId;
-                   returnRole.Name = source.Name;
-                   return returnRole;
-               });
+            //this.mockedMapper.Setup(x => x.Map<EF.SQL.Models.RoleDto>(It.IsAny<Domain.Role>()))
+            //   .Returns((Domain.Role source) =>
+            //   {
+            //       EF.SQL.Models.RoleDto returnRole = new EF.SQL.Models.RoleDto();
+            //       returnRole.RoleId = source.RoleId;
+            //       returnRole.Name = source.Name;
+            //       return returnRole;
+            //   });
 
-            this.mockedRepository.Setup(x => x.AddUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.AddUser(It.IsAny<EF.SQL.Models.UserDto>()));
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
 
@@ -512,18 +512,18 @@ namespace Levinor.Business.Test
                     CurrentPassword = mockedResponse[0].Password.Password,
                     ExpiringDate = mockedResponse[0].Password.ExpiringDate
                 },
-                Role = new Role
-                {
-                    RoleId = mockedResponse[0].Role.RoleId,
-                    Name = mockedResponse[0].Role.Name
-                }
+                //Role = new Role
+                //{
+                //    RoleId = mockedResponse[0].Role.RoleId,
+                //    Name = mockedResponse[0].Role.Name
+                //}
             };
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Deleter)).Returns(true);
-            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserTable>()));
-            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>())).Returns(new EF.SQL.Models.UserTable());
+            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserDto>()));
+            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>())).Returns(new EF.SQL.Models.UserDto());
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
-            service.DeleteUser(Guid.Parse(token), "ll@ecorp.com");
+            service.DeactiveUser(Guid.Parse(token), "ll@ecorp.com");
 
             // If execution don't throw an exception the method went ok.
             Assert.True(true);
@@ -550,24 +550,24 @@ namespace Levinor.Business.Test
                     CurrentPassword = mockedResponse[creatorIndex].Password.Password,
                     ExpiringDate = mockedResponse[creatorIndex].Password.ExpiringDate
                 },
-                Role = new Role
-                {
-                    RoleId = mockedResponse[creatorIndex].Role.RoleId,
-                    Name = mockedResponse[creatorIndex].Role.Name
-                }
+                //Role = new Role
+                //{
+                //    RoleId = mockedResponse[creatorIndex].Role.RoleId,
+                //    Name = mockedResponse[creatorIndex].Role.Name
+                //}
             };
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Deleter)).Returns(true);
             
-            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserTable>()));
-            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>())).Returns(new EF.SQL.Models.UserTable());
+            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserDto>()));
+            this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>())).Returns(new EF.SQL.Models.UserDto());
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
 
             // If execution don't throw an exception the method went ok.
-            var ex = Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com"));
+            var ex = Assert.Throws<ArgumentException>(() => service.DeactiveUser(Guid.Parse(token), "ll@ecorp.com"));
 
             //Assert
-            Assert.That(Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com")).GetType().Name == "ArgumentException");
+            Assert.That(Assert.Throws<ArgumentException>(() => service.DeactiveUser(Guid.Parse(token), "ll@ecorp.com")).GetType().Name == "ArgumentException");
         }
 
         [Test]
@@ -591,24 +591,24 @@ namespace Levinor.Business.Test
                     CurrentPassword = mockedResponse[creatorIndex].Password.Password,
                     ExpiringDate = mockedResponse[creatorIndex].Password.ExpiringDate
                 },
-                Role = new Role
-                {
-                    RoleId = mockedResponse[creatorIndex].Role.RoleId,
-                    Name = mockedResponse[creatorIndex].Role.Name
-                }
+                //Role = new Role
+                //{
+                //    RoleId = mockedResponse[creatorIndex].Role.RoleId,
+                //    Name = mockedResponse[creatorIndex].Role.Name
+                //}
             };
             this.mockedCache.Setup(x => x.checkAuthToken(Guid.Parse(token), out Deleter)).Returns(true);
 
-            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserTable>()));
+            this.mockedRepository.Setup(x => x.DeleteUser(It.IsAny<EF.SQL.Models.UserDto>()));
             this.mockedRepository.Setup(x => x.GetUserByEmail(It.IsAny<string>()));
 
             service = new UserService(mockedRepository.Object, mockedMapper.Object, mockedCache.Object);
 
             // If execution don't throw an exception the method went ok.
-            var ex = Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com"));
+            var ex = Assert.Throws<ArgumentException>(() => service.DeactiveUser(Guid.Parse(token), "ll@ecorp.com"));
 
             //Assert
-            Assert.That(Assert.Throws<ArgumentException>(() => service.DeleteUser(Guid.Parse(token), "ll@ecorp.com")).GetType().Name == "ArgumentException");
+            Assert.That(Assert.Throws<ArgumentException>(() => service.DeactiveUser(Guid.Parse(token), "ll@ecorp.com")).GetType().Name == "ArgumentException");
         }
     }
 }

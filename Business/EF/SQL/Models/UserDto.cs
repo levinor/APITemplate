@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Levinor.Business.Utils;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Levinor.Business.EF.SQL.Models
 {
     [Table("User", Schema = "dbo")]
-    public class UserTable
+    public class UserDto
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,19 +24,20 @@ namespace Levinor.Business.EF.SQL.Models
         [MaxLength(50)]
         public string Email { get; set; }
 
-        public int RoleId { get; set; }
-
-        [ForeignKey("RoleId")]
-        public virtual RoleTable Role { get; set; }
+        public UserType Role { get; set; }
 
         public int PasswordId { get; set; }
 
         [ForeignKey("PasswordId")]
-        public virtual PasswordTable Password { get; set; }
+        public virtual PasswordDto Password { get; set; }
 
         [Required]
         public DateTime DateUpdated { get; set; }
 
-        public UserTable UserUpdated { get; set; }
+        public UserDto Updater { get; set; }
+
+        public UserDto Supervisor { get; set; }
+
+        public bool Active { get; set; }
     }
 }

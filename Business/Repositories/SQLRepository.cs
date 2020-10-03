@@ -18,12 +18,12 @@ namespace Levinor.Business.Repositories
             _serviceProvider = serviceProvider;          
         }
 
-        public IEnumerable<UserTable> GetAllUsers()
+        public IEnumerable<UserDto> GetAllUsers()
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                List<UserTable> response =  context.Users
+                List<UserDto> response =  context.Users
                         .Include(User =>User.Role)
                         .Include(User => User.Password)
                         .ToList();
@@ -31,12 +31,12 @@ namespace Levinor.Business.Repositories
             }
         }
 
-        public UserTable GetUserById(int id)
+        public UserDto GetUserById(int id)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                UserTable response = context.Users
+                UserDto response = context.Users
                     .Include(User => User.Role)
                     .ToList()
                     .Where(u => u.UserId == id)
@@ -45,60 +45,58 @@ namespace Levinor.Business.Repositories
             }
         }
 
-        public UserTable GetUserByEmail(string email)
+        public UserDto GetUserByEmail(string email)
         {
-                IEnumerable<UserTable> response = GetAllUsers();
+                IEnumerable<UserDto> response = GetAllUsers();
                 return response.Where(u => u.Email == email).FirstOrDefault();
         }
 
-        public void UpsertUser(UserTable user)
+        public void UpsertUser(UserDto user)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                var role = context.Find<RoleTable>(user.Role.RoleId);
+                var role = context.Find<RoleDto>(user.Role.RoleId);
                 user.Role = role;
-                var modificator = context.Find<UserTable>(user.UserUpdated.UserId);
+                var modificator = context.Find<UserDto>(user.UserUpdated.UserId);
                 user.UserUpdated = modificator;
                 context.Update(user);
                 context.SaveChanges();
             }
         }
 
-        public void AddUser(UserTable user)
+        public void AddUser(UserDto user)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                var role = context.Find<RoleTable>(user.Role.RoleId);
+                var role = context.Find<RoleDto>(user.Role.RoleId);
                 user.Role = role;
-                var modificator = context.Find<UserTable>(user.UserUpdated.UserId);
+                var modificator = context.Find<UserDto>(user.UserUpdated.UserId);
                 user.UserUpdated = modificator;
                 context.Users.Add(user);
                 context.SaveChanges();
             }
         }
-        public RoleTable GetRoleById(int id)
+        public RoleDto GetRoleById(int id)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                RoleTable response = context.Roles                    
+                RoleDto response = context.Roles                    
                     .ToList()
                     .Where(u => u.RoleId == id)
                     .FirstOrDefault();
                 return response;
             }
         }
-        public void DeleteUser(UserTable user)
+        public void DeleteUser(UserDto user)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SQLEFContext>();
-                user = context.Find<UserTable>(user.UserId);
-                var pass = context.Find<PasswordTable>(user.PasswordId);
-                context.Remove(pass);
-                context.Remove(user);
+                user = context.Find<UserDto>(user.UserId);
+                user.Active = false;               
                 context.SaveChanges();
             }
         }

@@ -31,40 +31,28 @@ namespace Levinor.Business.Services
             _cacheService = cache;
         }
 
-        public IEnumerable<GetUserResponse> GetAllUsers()
+        public IEnumerable<User> GetAllUsers()
         {
-            List<GetUserResponse> response = new List<GetUserResponse>();
-            _repository.GetAllUsers().ToList().ForEach(x => {
-                User user = _mapper.Map<Domain.User>(x);
-                response.Add(new GetUserResponse
-                {
-                    User = user,
-                    Role = user.Role
-                });
+            List<User> response = new List<User>();
+            GetAllUsers().ToList().ForEach(x => {
+
+                response.Add(_mapper.Map<User>(x));
                 });
             return response;
         }
 
 
-        public GetUserResponse GetUserById(int Id)
+        public User GetUserById(int Id)
         {
-
-            UserTable userTable = _repository.GetUserById(Id);
+            UserDto userTable = _repository.GetUserById(Id);
             if (userTable == null) throw new ArgumentException($"User with ID: {Id} does not exist.");
 
-            User user = _mapper.Map<User>(userTable);
-            GetUserResponse response = new GetUserResponse
-            {
-                User = user,
-                Role = user.Role
-            };
-
-            return response;
+            return _mapper.Map<User>(userTable);   
         }
 
         public Token GetLoginToken(User userRequest, Password passwordRequest)
         {
-            UserTable userTable = _repository.GetUserByEmail(userRequest.Email);
+            UserDto userTable = _repository.GetUserByEmail(userRequest.Email);
             if (userTable == null) throw new ArgumentException("Incorrect Password or User");
 
             User user = _mapper.Map<User>(userTable);
@@ -94,8 +82,7 @@ namespace Levinor.Business.Services
 
         public void SetNewPassword(Guid token, User userRequest, Password passwordRequest)
         {
-            User user;
-            _cacheService.checkAuthToken(token, out user);
+            _cacheService.checkAuthToken(token, out User user);
 
             if (user.Email != userRequest.Email)
                 throw new ArgumentException("Only logged users can change their password");
@@ -118,14 +105,13 @@ namespace Levinor.Business.Services
 
             user.Password.CurrentPassword = newKey;
             user.Password.ExpiringDate = DateTime.Now.AddMonths(6);
-            _repository.UpsertUser(_mapper.Map<EF.SQL.Models.UserTable>(user));
+            _repository.UpsertUser(_mapper.Map<EF.SQL.Models.UserDto>(user));
         }
-        public void SetNewUser(Guid token, User userRequest, Password passwordRequest, Role roleRequest)
+        public void SetNewUser(Guid token, User userRequest, Password passwordRequest)
         {
-            User creator;
-            _cacheService.checkAuthToken(token, out creator);
+            _cacheService.checkAuthToken(token, out User creator);
 
-            if (Enum.Parse<UserType>(creator.Role.Name) != UserType.Administrator) throw new ArgumentException("Only Admins can create new users");
+            if ((creator.Role) < UserType.RegionalManager) throw new ArgumentException("Only Managers can create new users");
 
             string newKey;
             using (var algorithm = new Rfc2898DeriveBytes(passwordRequest.NewPassword, Encoding.ASCII.GetBytes(KeySalt)))
@@ -133,33 +119,34 @@ namespace Levinor.Business.Services
                 newKey = Convert.ToBase64String(algorithm.GetBytes(KeySize));
             }
 
-            EF.SQL.Models.UserTable newUser = new EF.SQL.Models.UserTable
+            EF.SQL.Models.UserDto newUser = new EF.SQL.Models.UserDto
             {
                 Name = userRequest.Name,
                 Surename = userRequest.Surename,
                 Email = userRequest.Email,
                 DateUpdated = DateTime.Now,
-                UserUpdated = _mapper.Map<EF.SQL.Models.UserTable>(creator),
-                Password = new EF.SQL.Models.PasswordTable
+                Updater = _mapper.Map<EF.SQL.Models.UserDto>(creator),
+                Password = new EF.SQL.Models.PasswordDto
                 {
                     Password = newKey,
                     ExpiringDate = DateTime.Now.AddMonths(6)
                 },
-                Role = _mapper.Map <EF.SQL.Models.RoleTable>(roleRequest)
+                Role = userRequest.Role
             };           
 
             _repository.AddUser(newUser);
         }
 
-        public void DeleteUser(Guid token, string email)
+        public void DeactiveUser(Guid token, string email)
         {
-            User admin;
-            _cacheService.checkAuthToken(token, out admin);
-            if (Enum.Parse<UserType>(admin.Role.Name) != UserType.Administrator) throw new ArgumentException("Only Admins can delete users");
+            _cacheService.checkAuthToken(token, out User CEO);
+            if ((CEO.Role) < UserType.CEO) throw new ArgumentException("Only the CEO can deactivate users");
 
-            UserTable toDelete = _repository.GetUserByEmail(email);
+            UserDto toDelete = _repository.GetUserByEmail(email);
             if (toDelete == null) throw new ArgumentException("User not found");
 
+            //Generate action in the internal project
+            
             _repository.DeleteUser(toDelete);
         }
 

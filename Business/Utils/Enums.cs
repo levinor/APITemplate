@@ -8,12 +8,32 @@ namespace Levinor.Business.Utils
     public enum UserType
     {
         /// <summary>
-        /// Administrator
+        /// Company CEO
         /// </summary>
-        Administrator,
+        CEO,
         /// <summary>
-        /// User
+        /// GlobalManager
         /// </summary>
-        User
+        GlobalManager,
+        /// <summary>
+        /// RegionalManager
+        /// </summary>
+        RegionalManager,
+        /// <summary>
+        /// Analist
+        /// </summary>
+        Analist,
+        /// <summary>
+        /// Agent
+        /// </summary>
+        Agent,
+        /// <summary>
+        /// Asset
+        /// </summary>
+        Asset,
+        /// <summary>
+        /// PersonOFInterest
+        /// </summary>
+        POF
     }
 }

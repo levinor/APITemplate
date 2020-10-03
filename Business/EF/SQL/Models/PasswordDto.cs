@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Dynamic;
-using System.Text;
 
 namespace Levinor.Business.EF.SQL.Models
 {
     [Table("Password", Schema = "dbo")]
-    public class PasswordTable
+    public class PasswordDto
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,7 +17,7 @@ namespace Levinor.Business.EF.SQL.Models
         
 
         [ForeignKey("UserId")]
-        public UserTable User { get; set; }
+        public UserDto User { get; set; }
 
         public DateTime ExpiringDate { get; set; }
 
