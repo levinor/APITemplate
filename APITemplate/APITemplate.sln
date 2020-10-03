@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Levinor.APITemplate", "Levi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Levinor.Business", "..\Business\Levinor.Business.csproj", "{13175E9D-35C8-40BE-A037-EAA44250434B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Levinor.Business.Test", "..\Levinor.UnitTesting\Levinor.Business.Test.csproj", "{CF14E842-0F18-4D0C-808C-2D65E2A8A023}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Levinor.Business.Test", "..\Levinor.UnitTesting\Levinor.Business.Test.csproj", "{CF14E842-0F18-4D0C-808C-2D65E2A8A023}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{22D1AE3E-27D5-455F-B604-865B12F6E619}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

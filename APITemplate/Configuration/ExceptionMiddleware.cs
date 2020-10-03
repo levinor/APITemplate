@@ -10,28 +10,30 @@ namespace Levinor.APITemplate.Configuration
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext, ILogger logger)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             try
-            {
+            {                
                 await _next(httpContext).ConfigureAwait(false);
             }
             catch (ArgumentException ex)
             {
-                logger.LogError(ex.ToString());
+                _logger.LogError(ex.ToString());
                 httpContext.Response.ContentType = "application/json";
                 httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 await httpContext.Response.WriteAsync(ex.Message);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.ToString());
+                _logger.LogError(ex.ToString());
                 httpContext.Response.ContentType = "application/json";
                 httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 await httpContext.Response.WriteAsync(ex.Message);
@@ -39,7 +41,7 @@ namespace Levinor.APITemplate.Configuration
             finally
             {
                 RouteData route = httpContext.GetRouteData();
-                if (route != null && route.Values != null) logger.LogError((route.Values.TryGetValue("action", out object action)) ? action.ToString() : "Unknown");
+                if (route != null && route.Values != null) _logger.LogError((route.Values.TryGetValue("action", out object action)) ? action.ToString() : "Unknown");
             }
         }
     }
